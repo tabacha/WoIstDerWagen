@@ -43,4 +43,4 @@ def getLiveData(search,station):
             return train
 
 
-print(getLiveData(search,station))
+#print(getLiveData(search,station))
