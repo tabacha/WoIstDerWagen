@@ -56,4 +56,4 @@ def getLiveData(search,station):
     #print(trains)
 
 
-print(getLiveData(search,station))
+#print(getLiveData(search,station))
