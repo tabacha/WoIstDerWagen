@@ -5,7 +5,7 @@ from mysql.connector import (connection)
 import msgParse
 
 cnx = connection.MySQLConnection(user=config.MYSQL_USER, password=config.MYSQL_PASSWORD, host= config.MYSQL_HOST, database=config.MYSQL_DB)
-inTxt=sys.argv[1]
+inTxt=' '.join(sys.argv[1:])
 outTxt= msgParse.answer(inTxt, cnx)
 print(inTxt +'\n'+ outTxt)
 cnx.close();
