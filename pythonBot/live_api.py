@@ -42,12 +42,15 @@ def getLiveData(search,station):
     while True:
         trains_current=requests.get("https://open-api.bahn.de/bin/rest.exe/arrivalBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json")
 
-        trains=trains+trains_current.json()['ArrivalBoard']['Arrival']
-    #    print(trains[len(trains)-1]['time'])
-        if(trains[len(trains)-1]['time'][:2]<lastTime[:2]):
-            break
+        if(trains_current.json()['ArrivalBoard']['Arrival']):
+            trains=trains+trains_current.json()['ArrivalBoard']['Arrival']
+        #    print(trains[len(trains)-1]['time'])
+            if(trains[len(trains)-1]['time'][:2]<lastTime[:2]):
+                break
+            else:
+                lastTime=trains[len(trains)-1]['time']
         else:
-            lastTime=trains[len(trains)-1]['time']
+            break
     train=findTrain(search,trains)
     if(train):
         return train
