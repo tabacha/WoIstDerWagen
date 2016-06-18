@@ -4,7 +4,7 @@ CONSUMER_SECRET = ''
 ACCESS_KEY = ''
 ACCESS_SECRET = ''
 
-# Deutsche Bahn API Key:
+#api key to access the data from the DB open Data API
 API_KEY =''
 
 # Mysql data:
