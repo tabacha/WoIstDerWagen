@@ -28,9 +28,22 @@ def answer(msg, cnx):
         zugArt=m.group(1)
         zugNr=m.group(2)
         bahnhof=m.group(3)
+        waggonNr=m.group(4)
         print('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
-        return 'Nicht implementiert'
+        if (bahnhof.upper() == 'BERLIN'):
+            cursor = cnx.cursor()
+            query = cursor.execute('SELECT waggonsections FROM waggons WHERE trainname=\'%s%s\' and waggonname=\'%s\'' % (zugArt.upper(), zugNr, waggonNr))
+            abschnitt=cursor.fetchone()
+            if (abschnitt):
+                abschnitt=abschnitt[0]
+            else:
+                abschnitt='unklar'
+            print('XX_ABSCHNITT '+abschnitt);
+            abfahrtStr=abfahrt(rtn['abfahrt'])
+            return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time'] + ' Bereich: ' + abschnitt + ' ' + abfahrtStr
+        else:                           
+            return 'Nicht implementiert'
     # else:
     for query in LIVE_QUERYS:
       if m:
