@@ -9,7 +9,16 @@ WAGEN_QUERYS=[re.compile('^#?([a-zA-Z]+)(\d+) (.*) (\d*)$'),
               re.compile('^#?([a-zA-Z]+)(\d+) (.*) Wagen \s+(\d*)$')]
 
 def answer(msg, cnx):
+    print('msg=\"'+msg+'\"')
     m=False
+    for query in WAGEN_QUERYS:
+        if m:
+            pass
+        else:
+            m=query.match(msg)
+    if (m):
+        return 'Nicht implementiert'
+    # else:
     for query in LIVE_QUERYS:
       if m:
           pass
@@ -29,19 +38,11 @@ def answer(msg, cnx):
             # afahrt
             abfahrt='fährt jetzt ab'
             if (rtn['abfahrt']<0):
-                'SEIT '+((-1)*rtn['abfahrt'])+' MIN. WEG'
+                'SEIT '+str(((-1)*rtn['abfahrt']))+' MIN. WEG'
             else: 
                 if (rtn['abfahrt']>0):
-                    'fährt in '+rtn['abfahrt']+' Min. ab'
+                    'fährt in '+str(rtn['abfahrt'])+' Min. ab'
             return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time']
-    else:
-        for query in LIVE_QUERY:
-           if m:
-               pass
-           else:
-             m=LIVE_QUERY.match(msg)
-        if (m):
-            return 'Nicht implementiert'
-        else:
-            return 'Den Befehl kenne ich nicht'
+    #  else:
+    return 'Den Befehl kenne ich nicht'
 
