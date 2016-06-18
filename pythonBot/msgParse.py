@@ -4,9 +4,9 @@ import re
 ZUGTYPEN=['ICE','IC','EC','RJ','EN','TGV','CNL','AZ','D','HKX','RE','RB','IRE','S','DPN','THA']
 
 LIVE_QUERYS=[re.compile('^#?([a-zA-Z]+)(\d+) (.*)$')]
-WAGEN_QUERYS=[re.compile('^#?([a-zA-Z]+)(\d+) (.*) (\d*)$'),
-              re.compile('^#?([a-zA-Z]+)(\d+) (.*) Wg. \s+(\d*)$'),
-              re.compile('^#?([a-zA-Z]+)(\d+) (.*) Wagen \s+(\d*)$')]
+WAGEN_QUERYS=[re.compile('^#?([a-zA-Z]+)(\d+) (.*) Wagen\s+(\d*)$'),
+              re.compile('^#?([a-zA-Z]+)(\d+) (.*) Wg.\s+(\d*)$'),
+              re.compile('^#?([a-zA-Z]+)(\d+) (.*)\s+(\d*)$')]
 
 def abfahrt(minu):
      if (minu<0):
@@ -16,6 +16,18 @@ def abfahrt(minu):
          return 'fährt in '+str(minu)+' Min. ab'
      return 'fährt jetzt ab'
 
+def liveApiOut(rtn):
+    if type(rtn)==str:
+        # ERROR
+        return rtn;
+    else:
+        # stopid
+        # afahrt
+        abfahrtStr=abfahrt(rtn['abfahrt'])
+        if ('track' in rtn):
+            return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
+        else:
+            return rtn['stop']+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
 def answer(msg, cnx):
     print('msg=\"'+msg+'\"')
     m=False
@@ -41,7 +53,7 @@ def answer(msg, cnx):
                 abschnitt='unklar'
             print('XX_ABSCHNITT '+abschnitt);
             abfahrtStr=abfahrt(rtn['abfahrt'])
-            return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time'] + ' Bereich: ' + abschnitt + ' ' + abfahrtStr
+            return 'Bereich ' + abschnitt + ' ' + liveApiOut(rtn)
         else:                           
             return 'Nicht implementiert'
     # else:
@@ -56,14 +68,7 @@ def answer(msg, cnx):
         bahnhof=m.group(3)
         print('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
-        if type(rtn)==str:
-            # ERROR
-            return rtn;
-        else:
-            # stopid
-            # afahrt
-            abfahrtStr=abfahrt(rtn['abfahrt'])
-            return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
+        return liveApiOut(rtn)
     #  else:
     return 'Den Befehl kenne ich nicht'
 
