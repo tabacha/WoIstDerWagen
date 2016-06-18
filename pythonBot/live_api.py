@@ -8,7 +8,7 @@ def findTrain(search,trains):
     now = datetime.datetime.now()
     for train in trains:
         if(train['name']==search):
-            train["abfahrt"]=int(train['time'][:2])*60+int(train['time'][3:])-now.hour*60+now.minute
+            train["abfahrt"]=(int(train['time'][:2])*60+int(train['time'][3:]))-(now.hour*60+now.minute)
             train["details"]=requests.get(train["JourneyDetailRef"]["ref"]).json()
             return train
 
