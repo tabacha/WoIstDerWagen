@@ -1,7 +1,14 @@
 # get this data from apps.twitter.com (you have to give twitter a mobile phone number to let this work, use a seperate account only for the bot)
-
 CONSUMER_KEY = ''
 CONSUMER_SECRET = ''
 ACCESS_KEY = ''
 ACCESS_SECRET = ''
+
+# Deutsche Bahn API Key:
 API_KEY =''
+
+# Mysql data:
+MYSQL_USER='wagendaten'
+MYSQL_PASSWORD=''
+MYSQL_HOST='irgendwas.eu-west-1.rds.amazonaws.com'
+MYSQL_DB='wagendaten'

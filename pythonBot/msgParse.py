@@ -10,7 +10,7 @@ def answer(msg, cnx):
         bahnhof=m.group(3)
         print('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
-        return 'Der Zug fährt auf Gleis '+rtn['track']+' Abfahrt '+ rtn['time']
+        return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time']
     else:
         return 'Den Befehl kenne ich nicht'
 
