@@ -11,6 +11,7 @@ def getLiveData(search,station):
     now = datetime.datetime.now()
     #print(stations)
     station_id=stations['LocationList']['StopLocation'][0]['id']
+    station_name=stations['LocationList']['StopLocation'][0]['name']
     d=now.strftime("%Y-%m-%d")
 
     trains=[]
@@ -41,6 +42,6 @@ def getLiveData(search,station):
     for train in trains:
         if(train['name']==search):
             return train
-
+    return "Zug "+train+ " konnte am Bahnhof "+station_name+" nicht gefunden werden."
 
 #print(getLiveData(search,station))
