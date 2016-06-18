@@ -13,7 +13,7 @@ def findTrain(search,trains):
             return train
 
 def getLiveData(search,station):
-
+    search=search.upper()
     stations=requests.get("https://open-api.bahn.de/bin/rest.exe/location.name?authKey="+config.API_KEY+"&lang=de&input="+station+"&format=json").json()
     now = datetime.datetime.now()
     #print(stations)
