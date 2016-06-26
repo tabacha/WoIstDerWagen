@@ -1,46 +1,33 @@
-Station
--------
+# How to get data in to database
+## Create a mysql database and a user
 
-    +--------+-------------+------+-----+---------+-------+
-    | Field  | Type        | Null | Key | Default | Extra |
-    +--------+-------------+------+-----+---------+-------+
-    | ID     | varchar(5)  | NO   | PRI |         |       |
-    | Name   | varchar(40) | NO   |     | NULL    |       |
-    | EVA_ID | int(11)     | NO   |     | NULL    |       |
-    +--------+-------------+------+-----+---------+-------+
+```mysql
+CREATE DATABASE WoIstDerWagen
+CREATE USER 'WoIstDerWagen'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON 'WoIstDerWagen' . * TO 'WoIstDerWagen'@'localhost';
+FLUSH PRIVILEGES;
+```
 
-Trains
-------
+## Download data from OpenDataPortal and unzip it
 
-    +------------+--------------+------+-----+---------+-------+
-    | Field      | Type         | Null | Key | Default | Extra |
-    +------------+--------------+------+-----+---------+-------+
-    | station_id | varchar(5)   | YES  |     | NULL    |       |
-    | track_id   | varchar(4)   | YES  |     | NULL    |       |
-    | type       | varchar(4)   | YES  |     | NULL    |       |
-    | number     | int(11)      | YES  |     | NULL    |       |
-    | name       | varchar(8)   | YES  |     | NULL    |       |
-    | starttime  | time         | YES  |     | NULL    |       |
-    | sections   | varchar(10)  | YES  |     | NULL    |       |
-    | addtext    | varchar(256) | YES  |     | NULL    |       |
-    +------------+--------------+------+-----+---------+-------+
+```bash
+wget http://download-data.deutschebahn.com/static/datasets/wagenstand/Wagenreihungsplan_RawData_20160617.zip
+unzip Wagenreihungsplan_RawData_20160617.zip
+```
 
-Waggons
--------
+## Import data to database
 
-    +----------------+--------------+------+-----+---------+-------+
-    | Field          | Type         | Null | Key | Default | Extra |
-    +----------------+--------------+------+-----+---------+-------+
-    | station_id     | varchar(5)   | YES  |     | NULL    |       |
-    | track_id       | varchar(4)   | YES  |     | NULL    |       |
-    | traintype      | varchar(4)   | YES  |     | NULL    |       |
-    | trainnumber    | int(11)      | YES  |     | NULL    |       |
-    | trainname      | varchar(8)   | YES  |     | NULL    |       |
-    | starttime      | time         | YES  |     | NULL    |       |
-    | waggonname     | int(11)      | YES  |     | NULL    |       |
-    | waggonsections | varchar(10)  | YES  |     | NULL    |       |
-    | addtext        | varchar(256) | YES  |     | NULL    |       |
-    | waggonposition | int(11)      | YES  |     | NULL    |       |
-    | waggontype     | varchar(5)   | YES  |     | NULL    |       |
-    | waggonsymbols  | varchar(10)  | YES  |     | NULL    |       |
-    +----------------+--------------+------+-----+---------+-------+
+```bash
+./stations2mysql.rb localhost WoIstDerWagen password WoIstDerWagen
+./trains2mysql.rb localhost WoIstDerWagen password WoIstDerWagen
+```
+
+(Please not that it is not relay good that we transport the database password in the command line, so perhabs do this on your development machine and afterwards do a database dump and put it to your productional machine)
+
+## TODO
+
+Indexes and references on the database
+
+## Weblinks
+
+http://data.deutschebahn.com/dataset/data-wagenreihungsplan-soll-daten
