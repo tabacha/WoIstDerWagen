@@ -14,7 +14,9 @@ def findTrain(search,trains):
 
 def getLiveData(search,station):
     search=search.upper()
-    stations=requests.get("https://open-api.bahn.de/bin/rest.exe/location.name?authKey="+config.API_KEY+"&lang=de&input="+station+"&format=json").json()
+    url="https://open-api.bahn.de/bin/rest.exe/location.name?authKey="+config.API_KEY+"&lang=de&input="+station+"&format=json"
+    print('get '+url)
+    stations=requests.get(url).json()
     now = datetime.datetime.now()
     #print(stations)
     station_id=stations['LocationList']['StopLocation'][0]['id']
@@ -24,7 +26,9 @@ def getLiveData(search,station):
     trains=[]
     lastTime="00:00"
     while True:
-        trains_current=requests.get("https://open-api.bahn.de/bin/rest.exe/departureBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json")
+        url="https://open-api.bahn.de/bin/rest.exe/departureBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json"
+        print(url)
+        trains_current=requests.get(url)
         #print(trains_current.json())
         if('Departure' in trains_current.json()['DepartureBoard']):
             trains=trains+trains_current.json()['DepartureBoard']['Departure']
@@ -40,11 +44,12 @@ def getLiveData(search,station):
     trains=[]
     lastTime="00:00"
     while True:
-        trains_current=requests.get("https://open-api.bahn.de/bin/rest.exe/arrivalBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json")
-        #print(trains_current.json())
-        if('ArrivalBoard' in trains_current.json()['ArrivalBoard']):
+        url="https://open-api.bahn.de/bin/rest.exe/arrivalBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json"
+        print(url)
+        trains_current=requests.get(url)
+        if('Arrival' in trains_current.json()['ArrivalBoard']):
             trains=trains+trains_current.json()['ArrivalBoard']['Arrival']
-        #    print(trains[len(trains)-1]['time'])
+            print(trains[len(trains)-1]['time'])
             if(trains[len(trains)-1]['time'][:2]<lastTime[:2]):
                 break
             else:

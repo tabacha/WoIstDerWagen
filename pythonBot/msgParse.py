@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import live_api
 import re
 
@@ -24,12 +25,14 @@ def liveApiOut(rtn):
         # stopid
         # afahrt
         abfahrtStr=abfahrt(rtn['abfahrt'])
+        gleisStr=''
         if ('track' in rtn):
-            return rtn['stop']+' Gleis '+rtn['track']+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
-        else:
-            return rtn['stop']+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
+             gleisStr=' Gleis '+rtn['track']
+        return rtn['stop']+gleisStr+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
+
 def answer(msg, cnx):
     print('msg=\"'+msg+'\"')
+    msg=msg.strip()
     m=False
     for query in WAGEN_QUERYS:
         if m:
@@ -43,19 +46,23 @@ def answer(msg, cnx):
         waggonNr=m.group(4)
         print('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
-        if (bahnhof.upper() == 'BERLIN'):
-            cursor = cnx.cursor()
-            query = cursor.execute('SELECT waggonsections FROM waggons WHERE trainname=\'%s%s\' and waggonname=\'%s\'' % (zugArt.upper(), zugNr, waggonNr))
-            abschnitt=cursor.fetchone()
-            if (abschnitt):
-                abschnitt=abschnitt[0]
-            else:
-                abschnitt='unklar'
-            print('XX_ABSCHNITT '+abschnitt);
-            abfahrtStr=abfahrt(rtn['abfahrt'])
-            return 'Bereich ' + abschnitt + ' ' + liveApiOut(rtn)
-        else:                           
-            return 'Nicht implementiert'
+        if type(rtn) == str:
+             # Fehler:
+             print('Fehler von LiveApi', rtn)
+             return rtn
+        cursor = cnx.cursor()
+        sql='SELECT w.sections,t.track_id,t.track_name,t.additional_text FROM trains t, stations s, waggons w WHERE '
+        sql=sql+'s.eva_id=%s and s.id=t.station_id  and t.number="%s" and w.train_id=t.id and w.number=%s' % (rtn['stopid'], zugNr, waggonNr)
+        query = cursor.execute(sql)
+        abschnitt=cursor.fetchone()
+        if (abschnitt):
+            abschnitt=abschnitt[0]
+        else:
+            print(sql)
+            abschnitt='unklar'
+        print('XX_ABSCHNITT '+abschnitt);
+        abfahrtStr=abfahrt(rtn['abfahrt'])
+        return 'Bereich ' + abschnitt + ' ' + liveApiOut(rtn)
     # else:
     for query in LIVE_QUERYS:
       if m:
