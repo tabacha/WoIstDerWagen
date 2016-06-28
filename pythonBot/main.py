@@ -34,8 +34,12 @@ while True:
         try:
             api.update_status(txt,mention.id)
             myLastTweet = api.me().timeline(count=1)
+        except tweepy.error.RateLimitError as e:
+            sleep=(60*15)-(time.time() %(60*15))
+            log.exception('Twitter Rate Limit error sleep=%f' % sleep)
+            time.sleep(sleep)
         except tweepy.error.TweepError as e:
-            log.error('Tweepy error',e)
+            log.exception('Tweepy error')
             time.sleep(20)
     time.sleep(120)
 cnx.close()
