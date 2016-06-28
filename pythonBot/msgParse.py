@@ -52,7 +52,7 @@ def answer(msg, cnx):
              return rtn
         cursor = cnx.cursor()
         sql='SELECT w.sections,t.track_id,t.track_name,t.additional_text FROM trains t, stations s, waggons w WHERE '
-        sql=sql+'s.eva_id=%s and s.id=t.station_id  and t.number="%s" and w.train_id=t.id and w.number=%s' % (rtn['stopid'], zugNr, waggonNr)
+        sql=sql+'s.eva_id=%s and s.id=t.station_id  and t.number="%s" and w.train_id=t.id and w.number=%s LIMIT 1' % (rtn['stopid'], zugNr, waggonNr)
         query = cursor.execute(sql)
         abschnitt=cursor.fetchone()
         if (abschnitt):
