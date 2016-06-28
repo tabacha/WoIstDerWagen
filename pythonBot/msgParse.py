@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import live_api
 import re
+import logging
+
+log = logging.getLogger(__name__)
 
 ZUGTYPEN=['ICE','IC','EC','RJ','EN','TGV','CNL','AZ','D','HKX','RE','RB','IRE','S','DPN','THA']
 
@@ -31,7 +34,7 @@ def liveApiOut(rtn):
         return rtn['stop']+gleisStr+' Abfahrt '+ rtn['time'] + ' '+ abfahrtStr
 
 def answer(msg, cnx):
-    print('msg=\"'+msg+'\"')
+    log.info('msg=\"'+msg+'\"')
     msg=msg.strip()
     m=False
     for query in WAGEN_QUERYS:
@@ -44,11 +47,11 @@ def answer(msg, cnx):
         zugNr=m.group(2)
         bahnhof=m.group(3)
         waggonNr=m.group(4)
-        print('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
+        log.debug('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
         if type(rtn) == str:
              # Fehler:
-             print('Fehler von LiveApi', rtn)
+             log.error('Fehler von LiveApi', rtn)
              return rtn
         cursor = cnx.cursor()
         sql='SELECT w.sections,t.track_id,t.track_name,t.additional_text FROM trains t, stations s, waggons w WHERE '
@@ -58,9 +61,9 @@ def answer(msg, cnx):
         if (abschnitt):
             abschnitt=abschnitt[0]
         else:
-            print(sql)
+            log.info('no result %s'%sql)
             abschnitt='unklar'
-        print('XX_ABSCHNITT '+abschnitt);
+        log.debug('XX_ABSCHNITT '+abschnitt);
         abfahrtStr=abfahrt(rtn['abfahrt'])
         return 'Bereich ' + abschnitt + ' ' + liveApiOut(rtn)
     # else:
@@ -73,7 +76,7 @@ def answer(msg, cnx):
         zugArt=m.group(1)
         zugNr=m.group(2)
         bahnhof=m.group(3)
-        print('1:'+zugArt+' '+zugNr+'\t2:'+bahnhof)
+        log.info('Art %s Nr: %s Bhf %s' % (zugArt,zugNr,bahnhof))
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
         return liveApiOut(rtn)
     #  else:

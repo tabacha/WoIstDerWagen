@@ -6,6 +6,14 @@ from mysql.connector import (connection)
 import msgParse
 import re
 
+import logging
+
+if (hasattr(config,'logger')):
+    import logging.config
+    logging.config.dictConfig(config.logger)
+
+log = logging.getLogger(__name__)
+
 cnx = connection.MySQLConnection(user=config.MYSQL_USER, password=config.MYSQL_PASSWORD, host= config.MYSQL_HOST, database=config.MYSQL_DB)
 auth = tweepy.OAuthHandler(config.CONSUMER_KEY, config.CONSUMER_SECRET)
 auth.set_access_token(config.ACCESS_KEY, config.ACCESS_SECRET)
@@ -14,16 +22,20 @@ myLastTweet = api.me().timeline(count=1)
 #print(myLastTweet)
 #print(myLastTweet[0].in_reply_to_status_id)
 pp = pprint.PrettyPrinter(indent=2);
-reTwitterHandle = re.compile("@WoIstDerWagen")
+reTwitterHandle = re.compile("@WoIstDerWagen", re.IGNORECASE)
 while True:
-    print('ask twitter for new tweets')
+    log.info('ask twitter for new tweets since %d',myLastTweet[0].in_reply_to_status_id)
     mentions = api.mentions_timeline(since_id=myLastTweet[0].in_reply_to_status_id)
     for mention in mentions:
-        print(mention.author.screen_name, '\t', mention.text)
+        log.info('Tweet %d from %s, Text: %s' % (mention.id, mention.author.screen_name, mention.text))
         question=reTwitterHandle.sub('', mention.text)
         txt='@' + mention.author.screen_name + ' ' + msgParse.answer(question, cnx)
-        print('Antwort an Twitter: '+txt)
-        api.update_status(txt,mention.id)
-        myLastTweet = api.me().timeline(count=1)
+        log.info('Answer to Twitter: %s' % (txt))
+        try:
+            api.update_status(txt,mention.id)
+            myLastTweet = api.me().timeline(count=1)
+        except tweepy.error.TweepError as e:
+            log.error('Tweepy error',e)
+            time.sleep(20)
     time.sleep(120)
 cnx.close()

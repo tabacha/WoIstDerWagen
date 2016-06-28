@@ -1,6 +1,9 @@
 import requests
 import datetime
 import config
+import logging
+
+log = logging.getLogger(__name__)
 
 search="EC x8"
 station="karlsruhe"
@@ -15,7 +18,7 @@ def findTrain(search,trains):
 def getLiveData(search,station):
     search=search.upper()
     url="https://open-api.bahn.de/bin/rest.exe/location.name?authKey="+config.API_KEY+"&lang=de&input="+station+"&format=json"
-    print('get '+url)
+    log.debug('get %s '%url)
     stations=requests.get(url).json()
     now = datetime.datetime.now()
     #print(stations)
@@ -27,7 +30,7 @@ def getLiveData(search,station):
     lastTime="00:00"
     while True:
         url="https://open-api.bahn.de/bin/rest.exe/departureBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json"
-        print(url)
+        log.debug('%s'%url)
         trains_current=requests.get(url)
         #print(trains_current.json())
         if('Departure' in trains_current.json()['DepartureBoard']):
@@ -45,11 +48,11 @@ def getLiveData(search,station):
     lastTime="00:00"
     while True:
         url="https://open-api.bahn.de/bin/rest.exe/arrivalBoard?authKey="+config.API_KEY+"&lang=de&id="+station_id+"&date="+d+"&time="+lastTime+"&format=json"
-        print(url)
+        log.debug("%s"%url)
         trains_current=requests.get(url)
         if('Arrival' in trains_current.json()['ArrivalBoard']):
             trains=trains+trains_current.json()['ArrivalBoard']['Arrival']
-            print(trains[len(trains)-1]['time'])
+            log.debug('time %s' % trains[len(trains)-1]['time'])
             if(trains[len(trains)-1]['time'][:2]<lastTime[:2]):
                 break
             else:
