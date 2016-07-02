@@ -22,8 +22,12 @@ def getLiveData(search,station):
     stations=requests.get(url).json()
     now = datetime.datetime.now()
     #print(stations)
-    station_id=stations['LocationList']['StopLocation'][0]['id']
-    station_name=stations['LocationList']['StopLocation'][0]['name']
+    try:
+        station_id=stations['LocationList']['StopLocation'][0]['id']
+        station_name=stations['LocationList']['StopLocation'][0]['name']
+    except:
+        log.error("Keine Station_id / name von der Live API gefunden %s JSON: %s" % (url, json.dumps(stations)))
+        return "Keine Station von der Live API gefunden"
     d=now.strftime("%Y-%m-%d")
 
     trains=[]

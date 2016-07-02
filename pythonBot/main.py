@@ -5,6 +5,7 @@ import tweepy, time, sys, pprint, config
 from mysql.connector import (connection) 
 import msgParse
 import re
+import os
 
 import logging
 
@@ -13,6 +14,7 @@ if (hasattr(config,'logger')):
     logging.config.dictConfig(config.logger)
 
 log = logging.getLogger(__name__)
+log.info('Starting WoIstDerWagen Twitter bot with pid %d' % os.getpid())
 
 cnx = connection.MySQLConnection(user=config.MYSQL_USER, password=config.MYSQL_PASSWORD, host= config.MYSQL_HOST, database=config.MYSQL_DB)
 auth = tweepy.OAuthHandler(config.CONSUMER_KEY, config.CONSUMER_SECRET)

@@ -51,7 +51,7 @@ def answer(msg, cnx):
         rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
         if type(rtn) == str:
              # Fehler:
-             log.error('Fehler von LiveApi', rtn)
+             log.error('Fehler von LiveApi %s' % rtn)
              return rtn
         cursor = cnx.cursor()
         sql='SELECT w.sections,t.track_id,t.track_name,t.additional_text FROM trains t, stations s, waggons w WHERE '
