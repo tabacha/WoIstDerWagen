@@ -54,18 +54,23 @@ def answer(msg, cnx):
              log.error('Fehler von LiveApi %s' % rtn)
              return rtn
         cursor = cnx.cursor()
-        sql='SELECT w.sections,t.track_id,t.track_name,t.additional_text FROM trains t, stations s, waggons w WHERE '
-        sql=sql+'s.eva_id=%s and s.id=t.station_id  and t.number="%s" and w.train_id=t.id and w.number=%s LIMIT 1' % (rtn['stopid'], zugNr, waggonNr)
+        sql='SELECT w.sections, t.additional_text FROM trains t, stations s, waggons w WHERE '
+        sql=sql+'s.eva_id=%s and s.id=t.station_id  and t.number="%s" and w.train_id=t.id and w.number=%s' % (rtn['stopid'], zugNr, waggonNr)
         query = cursor.execute(sql)
-        abschnitt=cursor.fetchone()
-        if (abschnitt):
-            abschnitt=abschnitt[0]
-        else:
-            log.info('no result %s'%sql)
-            abschnitt='unklar'
-        log.debug('XX_ABSCHNITT '+abschnitt);
-        abfahrtStr=abfahrt(rtn['abfahrt'])
-        return 'Bereich ' + abschnitt + ' ' + liveApiOut(rtn)
+        add_txts={}
+        for (sections, add_txt) in cursor:
+             if sections in add_txts:
+                  add_txts[sections]=add_txts[sections]+' oder '+add_txt
+             else:
+                  add_txts[sections]=add_txt
+        if len(add_txts)==1:
+             return 'Bereich ' + list(add_txts.keys())[0] + ' ' + liveApiOut(rtn)
+        if len(add_txts)==0:
+             return 'Bereich unklar ' + liveApiOut(rtn)
+        antwort='Bereich '
+        for key in add_txts.keys():
+             antwort=antwort+'%s (%s) ' % (key,add_txts[key])
+        return antwort + liveApiOut(rtn)
     # else:
     for query in LIVE_QUERYS:
       if m:
