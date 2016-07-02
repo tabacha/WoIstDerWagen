@@ -38,6 +38,11 @@ while True:
         txt='@' + mention.author.screen_name + ' ' + msgParse.answer(question, cnx)
         log.info('Answer to Twitter: %s' % (txt))
         try:
+            while (len(txt)>139):
+                firstPart=txt[:136]+'...'
+                log.info('msg>139 chars. Splitting. msg=%s' % (firstPart))
+                api.update_status(firstPart, mention.id)
+                txt='@' + mention.author.screen_name + ' ...' +txt[136:]
             api.update_status(txt,mention.id)
             myLastTweet = api.me().timeline(count=1)
         except tweepy.error.RateLimitError as e:
