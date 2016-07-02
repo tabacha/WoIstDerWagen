@@ -26,8 +26,12 @@ myLastTweet = api.me().timeline(count=1)
 pp = pprint.PrettyPrinter(indent=2);
 reTwitterHandle = re.compile("@WoIstDerWagen", re.IGNORECASE)
 while True:
-    log.info('ask twitter for new tweets since %d',myLastTweet[0].in_reply_to_status_id)
+
     mentions = api.mentions_timeline(since_id=myLastTweet[0].in_reply_to_status_id)
+    if (cnx.is_connected()==False):
+        log.info('mysql reconnect')
+        cnx.reconnect(attempts=2, delay=10)
+    log.info('ask twitter for new tweets since %d',myLastTweet[0].in_reply_to_status_id)
     for mention in mentions:
         log.info('Tweet %d from %s, Text: %s' % (mention.id, mention.author.screen_name, mention.text))
         question=reTwitterHandle.sub('', mention.text)
@@ -43,5 +47,7 @@ while True:
         except tweepy.error.TweepError as e:
             log.exception('Tweepy error')
             time.sleep(20)
+        except mysql.connector.errors.OperationalError as e:
+            log.exception('Mysql error')
     time.sleep(120)
 cnx.close()
