@@ -28,6 +28,9 @@ def liveApiOut(rtn):
 
 def anfrage(cnx, zugArt, zugNr, bahnhof, waggonNr):
     log.info('Art: %s Nr: %s Bhf: %s Wagen %s ' % (zugArt, zugNr, bahnhof, waggonNr))
+    if ((zugArt is None) or (zugNr is None)):
+        return 'Keine Zugnummer in Anfrage gefunden'
+
     rtn=live_api.getLiveData(zugArt+' '+zugNr, bahnhof)
     if type(rtn) == str:
         # Fehler:
