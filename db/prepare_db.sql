@@ -87,3 +87,18 @@ CREATE INDEX eva_id_idx ON stations (eva_id);
 CREATE INDEX train_number_idx ON trains (number);
 
 ALTER TABLE trains MODIFY number int(5);
+
+
+ALTER TABLE trains MODIFY additional_text varchar(256) CHARACTER SET utf8;
+UPDATE trains SET additional_text=CAST(CONVERT(additional_text USING latin1) AS BINARY);
+
+DELETE w FROM waggons w INNER JOIN trains t WHERE t.id=w.train_id AND t.track_id=33 AND t.station_id='FF';
+DELETE w FROM waggons w INNER JOIN trains t WHERE t.id=w.train_id AND t.track_id=33 AND t.station_id='FFS';
+DELETE FROM trains WHERE track_id=33 and station_id='FFS';
+DELETE FROM trains WHERE track_id=33 and station_id='FF';
+
+DELETE w FROM waggons w INNER JOIN trains t WHERE t.id=w.train_id AND t.track_id=0;
+DELETE FROM trains WHERE track_id=0;
+
+DELETE w FROM waggons w INNER JOIN trains t WHERE t.id=w.train_id AND t.number=71 and t.type='RB';
+DELETE FROM trains  WHERE  number=71 and type='RB';
