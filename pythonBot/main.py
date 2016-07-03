@@ -20,19 +20,15 @@ cnx = connection.MySQLConnection(user=config.MYSQL_USER, password=config.MYSQL_P
 auth = tweepy.OAuthHandler(config.CONSUMER_KEY, config.CONSUMER_SECRET)
 auth.set_access_token(config.ACCESS_KEY, config.ACCESS_SECRET)
 api = tweepy.API(auth)
-myLastTweet = api.me().timeline(count=1)
-#print(myLastTweet)
-#print(myLastTweet[0].in_reply_to_status_id)
-pp = pprint.PrettyPrinter(indent=2);
 reTwitterHandle = re.compile("@WoIstDerWagen", re.IGNORECASE)
 while True:
-
-    mentions = api.mentions_timeline(since_id=myLastTweet[0].in_reply_to_status_id)
+    inReplyToStatusId = api.me().timeline(count=1)[0].in_reply_to_status_id
+    log.info('ask twitter for new tweets since %d',inReplyToStatusId)
+    mentions = api.mentions_timeline(since_id=inReplyToStatusId)
     if (cnx.is_connected()==False):
         log.info('mysql reconnect')
         cnx.reconnect(attempts=2, delay=10)
-    log.info('ask twitter for new tweets since %d',myLastTweet[0].in_reply_to_status_id)
-    for mention in mentions:
+    for mention in reversed(mentions):
         log.info('Tweet %d from %s, Text: %s' % (mention.id, mention.author.screen_name, mention.text))
         question=reTwitterHandle.sub('', mention.text)
         txt='@' + mention.author.screen_name + ' ' + msgParse.answer(question, cnx)
@@ -43,9 +39,8 @@ while True:
                 log.info('msg>139 chars. Splitting. msg=%s' % (firstPart))
                 api.update_status(firstPart, mention.id)
                 txt='@' + mention.author.screen_name + ' ...' +txt[136:]
+            log.info('Tweet: %s' %(txt))
             api.update_status(txt,mention.id)
-            myLastTweet = api.me().timeline(count=1)
-            log.info('Last Tweet irts: %d', myLastTweet[0].in_reply_to_status_id)
         except tweepy.error.RateLimitError as e:
             sleep=(60*15)-(time.time() %(60*15))
             log.exception('Twitter Rate Limit error sleep=%f' % sleep)
