@@ -45,6 +45,7 @@ while True:
                 txt='@' + mention.author.screen_name + ' ...' +txt[136:]
             api.update_status(txt,mention.id)
             myLastTweet = api.me().timeline(count=1)
+            log.info('Last Tweet irts: %d', myLastTweet[0].in_reply_to_status_id)
         except tweepy.error.RateLimitError as e:
             sleep=(60*15)-(time.time() %(60*15))
             log.exception('Twitter Rate Limit error sleep=%f' % sleep)
