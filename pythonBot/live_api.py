@@ -16,8 +16,11 @@ def findTrain(search,trains):
             train["details"]=requests.get(train["JourneyDetailRef"]["ref"]).json()
             return train
 
-def getLiveData(search,station):
+def getLiveData(search, station):
     search=search.upper()
+    if (station is None):
+        log.error("Keine Station in der Anfrage gefunden")
+        return "Keine Station in der Anfrage gefunden"
     url="https://open-api.bahn.de/bin/rest.exe/location.name?authKey="+config.API_KEY+"&lang=de&input="+station+"&format=json"
     log.debug('get %s '%url)
     stations=requests.get(url).json()
