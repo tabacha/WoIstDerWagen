@@ -23,9 +23,18 @@ def getLiveData(search, station):
         return "Keine Station in der Anfrage gefunden"
     url="https://open-api.bahn.de/bin/rest.exe/location.name?authKey="+config.API_KEY+"&lang=de&input="+station+"&format=json"
     log.debug('get %s '%url)
-    stations=requests.get(url).json()
-    now = datetime.datetime.now()
+    try:
+        antwort=requests.get(url)
     #print(stations)
+    except:
+        log.error("API Fehler: %s " % url)
+        return "API Fehler"
+    try:
+        stations=antwort.json()
+    except:
+        log.error("API Format Fehler, kein JSON %s " % antwort)
+        return "API Format Fehler"
+    now = datetime.datetime.now()
     try:
         station_id=stations['LocationList']['StopLocation'][0]['id']
         station_name=stations['LocationList']['StopLocation'][0]['name']
